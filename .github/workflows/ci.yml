@@ -13,6 +13,14 @@ on: [push, pull_request]
 jobs:
   Run-Tests:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - {test: "lut"}
+          - {test: "ram"}
+          - {test: "wire"}
+
     steps:
 
     - uses: actions/checkout@v2
@@ -46,6 +54,4 @@ jobs:
       run: |
         source env.sh
         cd build
-        make all-xc7-tests -j`nproc`
-        make all-xc7-validation-tests -j`nproc`
-        make all-simulation-tests -j`nproc`
+        make all-${{ matrix.test }}-tests -j`nproc`

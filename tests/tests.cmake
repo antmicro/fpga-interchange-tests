@@ -97,6 +97,7 @@ function(add_xc7_test)
     get_target_property(XCFASM programs XCFASM)
     get_target_property(PYTHON3 programs PYTHON3)
 
+    add_custom_target(all-${name}-tests)
     foreach(board ${add_xc7_test_board_list})
         # Get board properties
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
@@ -148,7 +149,9 @@ function(add_xc7_test)
                 testbench ${testbench}
                 simlib_dir ${XILINX_UNISIM_DIR}
                 extra_libs ${XILINX_UNISIM_DIR}/../glbl.v
+                output_target sim_target
             )
+            add_dependencies(all-${name}-tests ${sim_target})
 
             add_simulation_test(
                 name post-synth-${name}
@@ -158,7 +161,9 @@ function(add_xc7_test)
                 testbench ${testbench}
                 simlib_dir ${XILINX_UNISIM_DIR}
                 extra_libs ${XILINX_UNISIM_DIR}/../glbl.v
+                output_target sim_target
             )
+            add_dependencies(all-${name}-tests ${sim_target})
         endif()
 
         # Logical netlist
@@ -284,6 +289,7 @@ function(add_xc7_test)
 
         add_custom_target(xc7-${test_name}-bit DEPENDS ${bit})
         add_dependencies(all-xc7-tests xc7-${test_name}-bit)
+        add_dependencies(all-${name}-tests xc7-${test_name}-bit)
     endforeach()
 
 endfunction()
@@ -455,6 +461,7 @@ function(add_xc7_validation_test)
         endif()
 
         add_dependencies(all-xc7-validation-tests xc7-${test_name}-fasm2bels-dcp)
+        add_dependencies(all-${name}-tests xc7-${test_name}-fasm2bels-dcp)
 
         if(DEFINED testbench)
             add_simulation_test(
@@ -465,7 +472,9 @@ function(add_xc7_validation_test)
                 testbench ${testbench}
                 simlib_dir ${XILINX_UNISIM_DIR}
                 extra_libs ${XILINX_UNISIM_DIR}/../glbl.v
+                output_target sim_target
             )
+            add_dependencies(all-${name}-tests ${sim_target})
         endif()
     endforeach()
 endfunction()
@@ -479,6 +488,7 @@ function(add_simulation_test)
     #    deps
     #    [extra_libs <extra libraries>]
     #    [simlib_dir <simulation lib directory>]
+    #    [output_target]
     # )
     #
     # Generates targets to run desired simulation tests.
@@ -494,13 +504,14 @@ function(add_simulation_test)
     #   - deps: dependencies to be met prior to running the simulation test
     #   - extra_libs (optional): verilog libraires for vendor-specific cells
     #   - simlib_dir (optional): simulation library directory
+    #   - output_target (optional): saves the final sim target in the output_target variable
     #
     # Targets generated:
     #   - sim-test-${test}-${board}-vvp : generates the VVP and VCD files
     #   - sim-test-${test}-${board}     : runs VVP
 
     set(options)
-    set(oneValueArgs board name testbench deps simlib_dir)
+    set(oneValueArgs board name testbench deps simlib_dir output_target)
     set(multiValueArgs sources extra_libs)
 
     cmake_parse_arguments(
@@ -518,6 +529,7 @@ function(add_simulation_test)
     set(extra_libs ${add_simulation_test_extra_libs})
     set(simlib_dir ${add_simulation_test_simlib_dir})
     set(testbench ${CMAKE_CURRENT_SOURCE_DIR}/${add_simulation_test_testbench})
+    set(output_target ${add_simulation_test_output_target})
 
     set(test_name "${name}-${board}")
 
@@ -553,6 +565,7 @@ function(add_simulation_test)
             ${IVERILOG}
             ${deps}
             ${testbench}
+            ${sources}
         WORKING_DIRECTORY
             ${output_dir}
     )
@@ -568,9 +581,14 @@ function(add_simulation_test)
                 -N
                 ${vvp_path}
         DEPENDS
+            ${vvp_path}
             ${VVP}
             sim-test-${test_name}-vvp
     )
 
     add_dependencies(all-simulation-tests sim-test-${test_name})
+
+    if (DEFINED output_target)
+        set(${output_target} sim-test-${test_name} PARENT_SCOPE)
+    endif()
 endfunction()
