@@ -18,3 +18,10 @@ add_xc7_validation_test(
     testbench counter_tb.v
     disable_vivado_test
 )
+
+add_generic_test(
+    name counter_bufr
+    board_list basys3
+    sources bufr.v
+    testbench counter_bufr.v
+)
