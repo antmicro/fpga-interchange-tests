@@ -16,3 +16,21 @@ add_generic_test(
     board_list basys3
     sources pll_buf_basys3.v plle2_test.v
 )
+
+add_generic_test(
+    name plle3_adv
+    board_list zcu104
+    sources util.v plle3_adv.v
+)
+
+add_generic_test(
+    name plle3_base
+    board_list zcu104
+    sources util.v plle3_base.v
+)
+
+add_generic_test(
+    name plle4_adv
+    board_list zcu104
+    sources util.v plle4_adv.v
+)
