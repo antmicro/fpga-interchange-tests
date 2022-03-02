@@ -34,3 +34,6 @@
 [submodule "third_party/litex-boards"]
 	path = third_party/litex-boards
 	url = https://github.com/litex-hub/litex-boards.git
+[submodule "third_party/f4pga-sdf-timing"]
+	path = third_party/f4pga-sdf-timing
+	url = https://github.com/chipsalliance/f4pga-sdf-timing
