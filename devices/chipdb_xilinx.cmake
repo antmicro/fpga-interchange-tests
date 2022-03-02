@@ -139,6 +139,7 @@ function(generate_xc7_device_db)
 
     get_target_property(input_device_loc ${constraints_luts_device} LOCATION)
     set(patched_device ${CMAKE_CURRENT_BINARY_DIR}/${device}.device)
+    set(TIMING_MAP ${PYTHON_INTERCHANGE_PATH}/test_data/series7_sdf_map.json)
     add_custom_command(
         OUTPUT ${patched_device}
         COMMAND
@@ -146,11 +147,13 @@ function(generate_xc7_device_db)
                 --family xc7
                 --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                 --timing_dir ${PRJXRAY_DB_DIR}/${family}
+                --timing_map ${TIMING_MAP}
                 ${input_device_loc}
                 ${patched_device}
         DEPENDS
             ${constraints_luts_device}
             ${input_device_loc}
+            ${TIMING_MAP}
     )
 
     add_custom_target(timing-${device}-device DEPENDS ${patched_device})
