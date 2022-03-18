@@ -54,14 +54,10 @@ module top (
         .I0        (clk0d),
         .O         (clk0)
     );
-    BUFGCTRL b1 (
-        .CE0   (1'b1),
-        .CE1   (1'b0),
-        .IGNORE1   (1'b1),
-        .S0        (1'b1),
-        .S1        (1'b0),
-        .I0        (clk1d),
-        .O         (clk1)
+    BUFGCE b1 (
+        .CE   (1'b1),
+        .I    (clk1d),
+        .O    (clk1)
     );
 
     wire rst0, rst1;
