@@ -238,14 +238,42 @@ function(add_generic_test)
                 OUTPUT ${phys}
                 COMMAND
                     ${VPR}
-                    ${device_loc} ${netlist}
-                    --arch_format fpga-interchange
-                    --circuit_format fpga-interchange
-                    --echo_file on
-                    --timing_analysis off
-                    --clustering_pin_feasibility_filter off
-                    --constant_net_method route
-                    --route_chan_width 20
+                        ${device_loc} ${netlist}
+                        --arch_format fpga-interchange
+                        --circuit_format fpga-interchange
+                        --echo_file on
+                        --timing_analysis off
+                        --clustering_pin_feasibility_filter off
+                        --constant_net_method route
+                        --route_chan_width 20
+                        --router_lookahead extended_map
+                        --write_router_lookahead lookahead.bin
+                        --write_rr_graph rr_graph.bin
+                DEPENDS
+                    ${arch}-${test_name}-netlist
+                    ${device_target}
+                    ${device_loc}
+                    ${netlist}
+                WORKING_DIRECTORY
+                    ${output_dir}
+            )
+
+            add_custom_target(
+                ${arch}-${test_name}-phys-gdb
+                COMMAND
+                    gdb --args ${VPR}
+                        ${device_loc} ${netlist}
+                        --arch_format fpga-interchange
+                        --circuit_format fpga-interchange
+                        --device ${part}
+                        --echo_file on
+                        --timing_analysis off
+                        --clustering_pin_feasibility_filter off
+                        --constant_net_method route
+                        --route_chan_width 20
+                        --router_lookahead extended_map
+                        --write_router_lookahead lookahead.bin
+                        --write_rr_graph rr_graph.bin
                 DEPENDS
                     ${arch}-${test_name}-netlist
                     ${device_target}
