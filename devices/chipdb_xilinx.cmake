@@ -137,7 +137,19 @@ function(generate_xc7_device_db)
         output_name ${device}_constraints_luts
     )
 
-    get_target_property(input_device_loc ${constraints_luts_device} LOCATION)
+    # Generate clustering rules patch
+    create_patched_device_db(
+        device ${device}
+        patch_name clustering-rules
+        patch_path clustering
+        patch_format yaml
+        patch_data ${PYTHON_INTERCHANGE_PATH}/test_data/series7_clustering.yaml
+        input_device ${constraints_luts_device}
+        output_target clustering_rules_device
+        output_name ${device}_clustering_rules
+    )
+
+    get_target_property(input_device_loc ${clustering_rules_device} LOCATION)
     set(patched_device ${CMAKE_CURRENT_BINARY_DIR}/${device}.device)
     add_custom_command(
         OUTPUT ${patched_device}
@@ -149,7 +161,7 @@ function(generate_xc7_device_db)
                 ${input_device_loc}
                 ${patched_device}
         DEPENDS
-            ${constraints_luts_device}
+            ${clustering_rules_device}
             ${input_device_loc}
     )
 
@@ -229,7 +241,19 @@ function(generate_xcup_device_db)
         output_name ${device}
     )
 
+    # Generate clustering rules patch
+    create_patched_device_db(
+        device ${device}
+        patch_name clustering-rules
+        patch_path clustering
+        patch_format yaml
+        patch_data ${PYTHON_INTERCHANGE_PATH}/test_data/xcup_clustering.yaml
+        input_device ${constraints_luts_device}
+        output_target clustering_rules_device
+        output_name ${device}_clustering_rules
+    )
+
     if(DEFINED device_target)
-        set(${device_target} ${constraints_luts_device} PARENT_SCOPE)
+        set(${device_target} ${clustering_rules_device} PARENT_SCOPE)
     endif()
 endfunction()
