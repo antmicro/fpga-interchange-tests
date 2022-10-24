@@ -159,3 +159,14 @@ jobs:
         git push -u origin +HEAD:gh-pages
         rm -rf .git
 
+  Install-Interchange-Devices:
+    runs-on: ubuntu-18.04
+    needs: Run-Tests
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Install interchange devices
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: |
+        .github/scripts/install.sh
